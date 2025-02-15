@@ -1,5 +1,4 @@
 /* main.css */
-
 body {
   font-family: Arial, sans-serif;
   margin: 0;
@@ -60,14 +59,12 @@ main {
   font-size: 16px;
 }
 
-/* Responsive adjustment for small screens */
 @media(max-width: 600px) {
   .chat-container {
     width: 90%;
   }
 }
 
-/* Message styles */
 .message {
   margin-bottom: 10px;
   line-height: 1.4;

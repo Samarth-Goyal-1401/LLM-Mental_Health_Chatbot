@@ -1,11 +1,9 @@
 // script.js
-
 document.addEventListener("DOMContentLoaded", function() {
   const chatOutput = document.getElementById('chatOutput');
   const userInput = document.getElementById('userInput');
   const sendBtn = document.getElementById('sendBtn');
 
-  // Append message to the chat area
   function appendMessage(sender, text) {
     const msgDiv = document.createElement('div');
     msgDiv.classList.add('message', sender);
@@ -14,16 +12,12 @@ document.addEventListener("DOMContentLoaded", function() {
     chatOutput.scrollTop = chatOutput.scrollHeight;
   }
 
-  // Send the user message to the /chat endpoint
   function sendMessage() {
     const message = userInput.value.trim();
     if (!message) return;
-    
-    // Append the user's message and clear the input
     appendMessage('user', message);
     userInput.value = '';
-    
-    // Fetch the bot's response
+
     fetch('/chat?msg=' + encodeURIComponent(message))
       .then(response => response.json())
       .then(data => {
@@ -35,7 +29,6 @@ document.addEventListener("DOMContentLoaded", function() {
       });
   }
 
-  // Event listeners for the send button and Enter key press
   sendBtn.addEventListener('click', sendMessage);
   userInput.addEventListener('keydown', function(e) {
     if (e.key === 'Enter') {
