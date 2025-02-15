@@ -5,28 +5,35 @@ import os
 
 app = Flask(__name__)
 
-# Check if a fine-tuned model exists; otherwise, use GPT-2 pre-trained model
+# Check if the fine-tuned model exists, otherwise use a pre-trained GPT-2 model
 model_dir = "./fine_tuned_model"
-if os.path.exists(model_dir):
-    tokenizer = AutoTokenizer.from_pretrained(model_dir)
-    model = AutoModelForCausalLM.from_pretrained(model_dir)
+
+if os.path.exists(model_dir) and os.path.isfile(f"{model_dir}/config.json"):
+    try:
+        tokenizer = AutoTokenizer.from_pretrained(model_dir)
+        model = AutoModelForCausalLM.from_pretrained(model_dir)
+        print("Loaded fine-tuned model successfully!")
+    except Exception as e:
+        print(f"Error loading fine-tuned model: {e}. Using GPT-2 instead.")
+        model_name = "gpt2"
+        tokenizer = AutoTokenizer.from_pretrained(model_name)
+        model = AutoModelForCausalLM.from_pretrained(model_name)
 else:
+    print("Fine-tuned model not found. Using GPT-2 instead.")
     model_name = "gpt2"
     tokenizer = AutoTokenizer.from_pretrained(model_name)
     model = AutoModelForCausalLM.from_pretrained(model_name)
 
-# Initialize a text-generation pipeline
+# Initialize the text-generation pipeline
 generator = pipeline("text-generation", model=model, tokenizer=tokenizer)
 
-# In-memory conversation history for demonstration
+# Store chat history in-memory (optional)
 conversation_history = []
 
 def generate_response(user_message):
-    # Create a simple prompt; you can incorporate conversation history if desired
     prompt = f"User: {user_message}\nBot:"
     response = generator(prompt, max_length=100, num_return_sequences=1)
-    bot_message = response[0]['generated_text']
-    # Optionally, post-process to remove echo of the prompt
+    bot_message = response[0]['generated_text'].split("Bot:")[-1].strip()
     return bot_message
 
 @app.route("/")

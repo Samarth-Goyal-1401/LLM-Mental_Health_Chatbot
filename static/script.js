@@ -1,4 +1,3 @@
-// script.js
 document.addEventListener("DOMContentLoaded", function() {
   const chatOutput = document.getElementById('chatOutput');
   const userInput = document.getElementById('userInput');

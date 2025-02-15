@@ -10,11 +10,11 @@ def load_dataset(file_path, tokenizer, block_size=128):
     )
 
 def main():
-    model_name = "gpt2"  # Base model to fine-tune
+    model_name = "gpt2"
     tokenizer = GPT2Tokenizer.from_pretrained(model_name)
     model = GPT2LMHeadModel.from_pretrained(model_name)
     
-    # Load your mental health data file
+    # Load dataset
     train_dataset = load_dataset("mental_health_data.txt", tokenizer, block_size=128)
     data_collator = DataCollatorForLanguageModeling(tokenizer=tokenizer, mlm=False)
     
@@ -38,7 +38,7 @@ def main():
     trainer.train()
     trainer.save_model("./fine_tuned_model")
     tokenizer.save_pretrained("./fine_tuned_model")
+    print("Fine-tuned model saved successfully!")
 
 if __name__ == "__main__":
     main()
-

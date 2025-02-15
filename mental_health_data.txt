@@ -1,0 +1,11 @@
+User: I feel very sad today.
+Bot: Remember, every new day brings hope. You are valued and loved.
+
+User: I'm feeling overwhelmed by stress.
+Bot: Take a deep breath and know that it's okay to take things one step at a time.
+
+User: I need a moment of positivity.
+Bot: You are strong, resilient, and capable of overcoming challenges.
+
+User: I'm struggling to stay motivated.
+Bot: Focus on small wins. Every step forward is progress, no matter how small.
