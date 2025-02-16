@@ -1,56 +1,29 @@
-# app.py
-from flask import Flask, request, jsonify, render_template
-from transformers import pipeline, AutoTokenizer, AutoModelForCausalLM
-import os
+# upload_model.py
+from transformers import AutoModelForCausalLM, AutoTokenizer
+from huggingface_hub import login
 
-app = Flask(__name__)
+# 🔹 Log in to Hugging Face
+login()  # This will prompt you to enter your Hugging Face token
 
-# Check if the fine-tuned model exists, otherwise use a pre-trained GPT-2 model
-model_dir = "./fine_tuned_model"
+# 🔹 Define your Hugging Face repo name (Replace with your actual username)
+repo_name = "Samarth1401/mental-health-chatbot"
 
-if os.path.exists(model_dir) and os.path.isfile(f"{model_dir}/config.json"):
-    try:
-        tokenizer = AutoTokenizer.from_pretrained(model_dir)
-        model = AutoModelForCausalLM.from_pretrained(model_dir)
-        print("Loaded fine-tuned model successfully!")
-    except Exception as e:
-        print(f"Error loading fine-tuned model: {e}. Using GPT-2 instead.")
-        model_name = "gpt2"
-        tokenizer = AutoTokenizer.from_pretrained(model_name)
-        model = AutoModelForCausalLM.from_pretrained(model_name)
-else:
-    print("Fine-tuned model not found. Using GPT-2 instead.")
-    model_name = "gpt2"
-    tokenizer = AutoTokenizer.from_pretrained(model_name)
-    model = AutoModelForCausalLM.from_pretrained(model_name)
+# 🔹 Load fine-tuned model from local directory
+try:
+    print("Loading fine-tuned model...")
+    model = AutoModelForCausalLM.from_pretrained("./fine_tuned_model")
+    tokenizer = AutoTokenizer.from_pretrained("./fine_tuned_model")
+    print("✅ Model loaded successfully!")
+except Exception as e:
+    print(f"❌ Error loading model: {e}")
+    exit(1)
 
-# Initialize the text-generation pipeline
-generator = pipeline("text-generation", model=model, tokenizer=tokenizer)
-
-# Store chat history in-memory (optional)
-conversation_history = []
-
-def generate_response(user_message):
-    prompt = f"User: {user_message}\nBot:"
-    response = generator(prompt, max_length=100, num_return_sequences=1)
-    bot_message = response[0]['generated_text'].split("Bot:")[-1].strip()
-    return bot_message
-
-@app.route("/")
-def home():
-    return render_template("index.html")
-
-@app.route("/chat", methods=["GET"])
-def chat():
-    user_message = request.args.get("msg", "")
-    if not user_message:
-        return jsonify({"response": "Please provide a message."})
-    
-    conversation_history.append({"role": "user", "content": user_message})
-    bot_message = generate_response(user_message)
-    conversation_history.append({"role": "bot", "content": bot_message})
-    
-    return jsonify({"response": bot_message})
-
-if __name__ == "__main__":
-    app.run(debug=True)
+# 🔹 Upload model & tokenizer to Hugging Face
+print(f"Uploading model to Hugging Face: {repo_name}...")
+try:
+    model.push_to_hub(repo_name, commit_message="Re-uploading fine-tuned model")
+    tokenizer.push_to_hub(repo_name, commit_message="Re-uploading tokenizer")
+    print(f"✅ Model successfully uploaded: https://huggingface.co/{repo_name}")
+except Exception as e:
+    print(f"❌ Upload failed: {e}")
+    exit(1)
